@@ -47,6 +47,7 @@ export default function Home() {
     const { data, error } = await supabase
       .from("todos")
       .insert([{ task: newTask }]);
+      data;
 
     if (error) {
       console.error("Error adding todo:", error);
