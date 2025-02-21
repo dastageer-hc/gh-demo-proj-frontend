@@ -14,12 +14,15 @@ interface Todo {
 export default function Home() {
   const [todos, setTodos] = useState<Todo[]>([]);
   const [newTask, setNewTask] = useState<string>("");
+  const [loading, setLoading] = useState(false);
 
   // Fetch todos from backend
   async function fetchTodos() {
+    setLoading(true);
     const response = await fetch(API_URL);
     const data = await response.json();
     setTodos(data);
+    setLoading(false);
   }
 
   useEffect(() => {
@@ -29,24 +32,27 @@ export default function Home() {
   // Function to add a new todo
   async function addTodo() {
     if (!newTask.trim()) return;
+    setLoading(true);
     const response = await fetch(API_URL, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ task: newTask }),
     });
-    const data = await response.json();
+    await response.json();
     fetchTodos();
     setNewTask("");
   }
 
   // Function to remove a todo
   async function removeTodo(id: number) {
+    setLoading(true);
     await fetch(`${API_URL}/${id}`, { method: "DELETE" });
     fetchTodos();
   }
 
   // Function to toggle completion status
   async function toggleTodoCompletion(id: number, completed: boolean) {
+    setLoading(true);
     await fetch(`${API_URL}/${id}`, {
       method: "PUT",
       headers: { "Content-Type": "application/json" },
@@ -70,10 +76,17 @@ export default function Home() {
               onChange={(e) => setNewTask(e.target.value)}
               placeholder='Enter a task...'
             />
-            <Button variant='contained' onClick={addTodo}>
-              Add
+            <Button variant='contained' onClick={addTodo} disabled={loading}>
+              {loading ? (
+                <span className='animate-spin h-5 w-5 border-t-2 border-white rounded-full'></span>
+              ) : (
+                "Add"
+              )}
             </Button>
           </div>
+          {loading && (
+            <div className='text-center text-gray-600'>Loading...</div>
+          )}
           <ul>
             {todos.map((todo) => (
               <li
@@ -93,11 +106,14 @@ export default function Home() {
                   />
                   {todo.task}
                 </div>
-                <button
+
+                  <button
                   className='bg-red-500 text-white px-2 py-1 rounded'
                   onClick={() => removeTodo(todo.id)}
-                >
+                  disabled={loading}
+                  >
                   Delete
+                  
                 </button>
               </li>
             ))}
