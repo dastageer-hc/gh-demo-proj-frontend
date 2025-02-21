@@ -3,7 +3,7 @@ import { useEffect, useState } from "react";
 import { Button, TextField } from "@mui/material";
 import MobileContainer from "./mobile-container";
 
-const API_URL = "https://dastageerhc-gh-demo-pro-61.deno.dev//todos";
+const API_URL = "https://dastageerhc-gh-demo-pro-92.deno.dev/todos";
 
 interface Todo {
   id: number;
