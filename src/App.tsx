@@ -35,14 +35,14 @@ export default function Home() {
       body: JSON.stringify({ task: newTask }),
     });
     const data = await response.json();
-    setTodos((prevTodos) => [...prevTodos, ...data]);
+    fetchTodos();
     setNewTask("");
   }
 
   // Function to remove a todo
   async function removeTodo(id: number) {
     await fetch(`${API_URL}/${id}`, { method: "DELETE" });
-    setTodos((prevTodos) => prevTodos.filter((todo) => todo.id !== id));
+    fetchTodos();
   }
 
   // Function to toggle completion status
@@ -52,11 +52,7 @@ export default function Home() {
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ completed: !completed }),
     });
-    setTodos((prevTodos) =>
-      prevTodos.map((todo) =>
-        todo.id === id ? { ...todo, completed: !completed } : todo
-      )
-    );
+    fetchTodos();
   }
 
   return (
@@ -82,20 +78,18 @@ export default function Home() {
             {todos.map((todo) => (
               <li
                 key={todo.id}
-                className={`flex justify-between items-center bg-gray-100 p-2 rounded mb-2 `}
+                className={`flex justify-between items-center bg-gray-100 p-2 rounded mb-2 ${
+                  todo.completed ? "line-through text-gray-500" : ""
+                }`}
               >
-                <div
-                  className={`flex items-center gap-2 ${
-                    todo.completed ? "line-through text-gray-500" : ""
-                  }`}
-                >
+                <div className='flex items-center gap-2'>
                   <input
                     type='checkbox'
                     checked={todo.completed}
                     onChange={() =>
                       toggleTodoCompletion(todo.id, todo.completed)
                     }
-                    className={`cursor-pointer `}
+                    className='cursor-pointer'
                   />
                   {todo.task}
                 </div>
